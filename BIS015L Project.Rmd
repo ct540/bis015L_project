@@ -1,6 +1,6 @@
 ---
 title: "BIS015L Project"
-author: 
+authors: "Chloe, Emily, Ibrahim"
 date: "`r Sys.Date()`"
 output:
   html_document: 
@@ -21,28 +21,41 @@ library(readr)
 
 ## Load the Data
 ```{r}
-diease_data <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.csv")
-diease_data
+disease <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.csv")
+disease
+```
+
+## Tidy Names of Data
+```{r}
+disease_tidy <- janitor::clean_names(diease_data)
+names(disease_tidy)
+```
+
+## Remove data we will not use
+```{r}
+disease_data <- disease_tidy %>% 
+  select(disease, county, year, sex, cases, population)
+disease_data
 ```
 
 ## Summary of Data
 
 ```{r}
-diease_data <- janitor::clean_names(diease_data)
-names(diease_data)
+skimr::skim(disease_data)
 ```
 
 ```{r}
-skimr::skim(diease_data)
+naniar::miss_var_summary(disease_data)
 ```
 
+## Remove NAs from data
 ```{r}
-naniar::miss_var_summary(diease_data)
+final_disease_data <- disease_data %>% 
+  na.omit()
+final_disease_data
 ```
-
-## Data already has "total" value for each county, we may want to get rid of this as its just a repeated data?
-
 ```{r}
-
-
+anyNA(final_disease_data)
 ```
+
+
