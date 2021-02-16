@@ -27,7 +27,7 @@ disease
 
 ## Tidy Names of Data
 ```{r}
-disease_tidy <- janitor::clean_names(diease_data)
+disease_tidy <- janitor::clean_names(disease)
 names(disease_tidy)
 ```
 
