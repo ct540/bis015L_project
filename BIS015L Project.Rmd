@@ -45,6 +45,10 @@ skimr::skim(disease_data)
 ```
 
 ```{r}
+dim(disease_data)
+```
+
+```{r}
 naniar::miss_var_summary(disease_data)
 ```
 

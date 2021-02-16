@@ -207,7 +207,7 @@ library(readr)</code></pre>
 <h2>Load the Data</h2>
 <pre class="r"><code>disease &lt;- readr::read_csv(&quot;Data/infectious-diseases-by-county-year-and-sex 2.csv&quot;)</code></pre>
 <pre><code>## Warning in gzfile(file, mode): cannot open compressed file &#39;C:/Users/erspe/
-## AppData/Local/Temp/RtmpoBTn9M\file4be0706d2701&#39;, probable reason &#39;No such file
+## AppData/Local/Temp/RtmpoBTn9M\file4dfc55eb2bca&#39;, probable reason &#39;No such file
 ## or directory&#39;</code></pre>
 <pre><code>## 
 ## -- Column specification --------------------------------------------------------
@@ -415,6 +415,8 @@ disease_data</code></pre>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>dim(disease_data)</code></pre>
+<pre><code>## [1] 164433      6</code></pre>
 <pre class="r"><code>naniar::miss_var_summary(disease_data)</code></pre>
 <pre><code>## # A tibble: 6 x 3
 ##   variable   n_miss pct_miss

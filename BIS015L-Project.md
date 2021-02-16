@@ -28,7 +28,7 @@ disease <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.cs
 
 ```
 ## Warning in gzfile(file, mode): cannot open compressed file 'C:/Users/erspe/
-## AppData/Local/Temp/RtmpoBTn9M\file4be0706d2701', probable reason 'No such file
+## AppData/Local/Temp/RtmpoBTn9M\file4dfc55eb2bca', probable reason 'No such file
 ## or directory'
 ```
 
@@ -145,6 +145,15 @@ Table: Data summary
 |year          |         0|          1.00|   2010.28|       5.49| 2001|  2006|   2010|   2015|     2019|▇▇▆▇▇ |
 |cases         |      4120|          0.97|     10.65|     142.95|    0|     0|      0|      0|    10001|▇▁▁▁▁ |
 |population    |         0|          1.00| 848040.32| 3527101.31|  563| 29245| 125234| 422487| 39959095|▇▁▁▁▁ |
+
+
+```r
+dim(disease_data)
+```
+
+```
+## [1] 164433      6
+```
 
 
 ```r
