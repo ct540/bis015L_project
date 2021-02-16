@@ -7,3 +7,24 @@ output:
     theme: spacelab
     keep_md: yes
 ---
+
+## Load Libraries 
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+library(paletteer)
+library(readr)
+``` 
+
+## Load the Data
+```{r}
+diease_data <- read_csv("Documents/bis015L_project/Data/infectious-diseases-by-county-year-and-sex 2.csv")
+diease_data
+```
+
+```{r}
+getwd()
+```
