@@ -21,10 +21,28 @@ library(readr)
 
 ## Load the Data
 ```{r}
-diease_data <- read_csv("Documents/bis015L_project/Data/infectious-diseases-by-county-year-and-sex 2.csv")
+diease_data <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.csv")
 diease_data
 ```
 
+## Summary of Data
+
 ```{r}
-getwd()
+diease_data <- janitor::clean_names(diease_data)
+names(diease_data)
+```
+
+```{r}
+skimr::skim(diease_data)
+```
+
+```{r}
+naniar::miss_var_summary(diease_data)
+```
+
+## Data already has "total" value for each county, we may want to get rid of this as its just a repeated data?
+
+```{r}
+
+
 ```
