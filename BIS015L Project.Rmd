@@ -14,9 +14,9 @@ output:
 library(tidyverse)
 library(janitor)
 library(here)
-library(naniar)
-library(paletteer)
-library(readr)
+library(albersusa)
+library(ggmap)
+library(svglite)
 ``` 
 
 ## Load the Data
@@ -62,4 +62,24 @@ final_disease_data
 anyNA(final_disease_data)
 ```
 
+## Uploading California County Map
 
+```{r}
+us_comp <- usa_sf()
+cnty_comp <- counties_sf()
+ca_comp <- us_comp %>% 
+  filter(name=="California")
+ca_comp <- us_comp %>% 
+  filter(name=="California")
+ca_cnty_comp <- cnty_comp %>% 
+  filter(state=="California")
+```
+
+
+```{r}
+cali_map <- ggplot() +
+  geom_sf(data = ca_comp, size = 0.125)+
+  geom_sf(data = ca_cnty_comp, size = 0.125)
+```
+
+## 

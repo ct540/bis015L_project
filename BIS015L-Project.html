@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-02-16" />
+<meta name="date" content="2021-02-28" />
 
 <title>BIS015L Project</title>
 
@@ -189,7 +189,7 @@ summary {
 
 
 <h1 class="title toc-ignore">BIS015L Project</h1>
-<h4 class="date">2021-02-16</h4>
+<h4 class="date">2021-02-28</h4>
 
 </div>
 
@@ -199,18 +199,15 @@ summary {
 <pre class="r"><code>library(tidyverse)
 library(janitor)
 library(here)
-library(naniar)
-library(paletteer)
-library(readr)</code></pre>
+library(albersusa)
+library(ggmap)
+library(svglite)</code></pre>
 </div>
 <div id="load-the-data" class="section level2">
 <h2>Load the Data</h2>
 <pre class="r"><code>disease &lt;- readr::read_csv(&quot;Data/infectious-diseases-by-county-year-and-sex 2.csv&quot;)</code></pre>
-<pre><code>## Warning in gzfile(file, mode): cannot open compressed file &#39;C:/Users/erspe/
-## AppData/Local/Temp/RtmpoBTn9M\file4dfc55eb2bca&#39;, probable reason &#39;No such file
-## or directory&#39;</code></pre>
 <pre><code>## 
-## -- Column specification --------------------------------------------------------
+## ── Column specification ────────────────────────────────────────────────────────
 ## cols(
 ##   Disease = col_character(),
 ##   County = col_character(),
@@ -226,17 +223,17 @@ library(readr)</code></pre>
 <pre><code>## # A tibble: 164,433 x 9
 ##    Disease  County   Year Sex   Cases Population Rate  Lower_95__CI Upper_95__CI
 ##    &lt;chr&gt;    &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;
-##  1 Amebias~ Alameda  2001 Fema~     7     746596 0.93~        0.377        1.93 
-##  2 Amebias~ Alameda  2001 Male      9     718968 1.25~        0.572        2.38 
-##  3 Amebias~ Alameda  2001 Total    16    1465564 1.09~        0.624        1.77 
-##  4 Amebias~ Alameda  2002 Fema~     4     747987 0.53~        0.146        1.37 
-##  5 Amebias~ Alameda  2002 Male      5     720481 0.69~        0.225        1.62 
-##  6 Amebias~ Alameda  2002 Total     9    1468468 0.61~        0.28         1.16 
-##  7 Amebias~ Alameda  2003 Fema~     1     747441 0.13~        0.003        0.745
-##  8 Amebias~ Alameda  2003 Male      5     719746 0.69~        0.226        1.62 
-##  9 Amebias~ Alameda  2003 Total     7    1467187 0.47~        0.192        0.983
-## 10 Amebias~ Alameda  2004 Fema~     3     746723 0.40~        0.083        1.17 
-## # ... with 164,423 more rows</code></pre>
+##  1 Amebias… Alameda  2001 Fema…     7     746596 0.93…        0.377        1.93 
+##  2 Amebias… Alameda  2001 Male      9     718968 1.25…        0.572        2.38 
+##  3 Amebias… Alameda  2001 Total    16    1465564 1.09…        0.624        1.77 
+##  4 Amebias… Alameda  2002 Fema…     4     747987 0.53…        0.146        1.37 
+##  5 Amebias… Alameda  2002 Male      5     720481 0.69…        0.225        1.62 
+##  6 Amebias… Alameda  2002 Total     9    1468468 0.61…        0.28         1.16 
+##  7 Amebias… Alameda  2003 Fema…     1     747441 0.13…        0.003        0.745
+##  8 Amebias… Alameda  2003 Male      5     719746 0.69…        0.226        1.62 
+##  9 Amebias… Alameda  2003 Total     7    1467187 0.47…        0.192        0.983
+## 10 Amebias… Alameda  2004 Fema…     3     746723 0.40…        0.083        1.17 
+## # … with 164,423 more rows</code></pre>
 </div>
 <div id="tidy-names-of-data" class="section level2">
 <h2>Tidy Names of Data</h2>
@@ -263,7 +260,7 @@ disease_data</code></pre>
 ##  8 Amebiasis Alameda  2003 Male       5     719746
 ##  9 Amebiasis Alameda  2003 Total      7    1467187
 ## 10 Amebiasis Alameda  2004 Female     3     746723
-## # ... with 164,423 more rows</code></pre>
+## # … with 164,423 more rows</code></pre>
 </div>
 <div id="summary-of-data" class="section level2">
 <h2>Summary of Data</h2>
@@ -446,9 +443,26 @@ final_disease_data</code></pre>
 ##  8 Amebiasis Alameda  2003 Male       5     719746
 ##  9 Amebiasis Alameda  2003 Total      7    1467187
 ## 10 Amebiasis Alameda  2004 Female     3     746723
-## # ... with 160,303 more rows</code></pre>
+## # … with 160,303 more rows</code></pre>
 <pre class="r"><code>anyNA(final_disease_data)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="uploading-california-county-map" class="section level2">
+<h2>Uploading California County Map</h2>
+<pre class="r"><code>us_comp &lt;- usa_sf()
+cnty_comp &lt;- counties_sf()
+ca_comp &lt;- us_comp %&gt;% 
+  filter(name==&quot;California&quot;)
+ca_comp &lt;- us_comp %&gt;% 
+  filter(name==&quot;California&quot;)
+ca_cnty_comp &lt;- cnty_comp %&gt;% 
+  filter(state==&quot;California&quot;)</code></pre>
+<pre class="r"><code>cali_map &lt;- ggplot() +
+  geom_sf(data = ca_comp, size = 0.125)+
+  geom_sf(data = ca_cnty_comp, size = 0.125)</code></pre>
+</div>
+<div id="section" class="section level2">
+<h2></h2>
 </div>
 
 
