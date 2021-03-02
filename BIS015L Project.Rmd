@@ -14,9 +14,12 @@ output:
 library(tidyverse)
 library(janitor)
 library(here)
-library(naniar)
-library(paletteer)
-library(readr)
+library(albersusa)
+library(ggmap)
+library(svglite)
+library(shiny)
+library(shinydashboard)
+options(scipen=999)
 ``` 
 
 ## Load the Data
@@ -62,4 +65,77 @@ final_disease_data
 anyNA(final_disease_data)
 ```
 
+## Uploading California County Map
 
+```{r}
+us_comp <- usa_sf()
+cnty_comp <- counties_sf()
+ca_comp <- us_comp %>% 
+  filter(name=="California")
+ca_comp <- us_comp %>% 
+  filter(name=="California")
+ca_cnty_comp <- cnty_comp %>% 
+  filter(state=="California")
+```
+
+
+```{r}
+cali_map <- ggplot() +
+  geom_sf(data = ca_comp, size = 0.125)+
+  geom_sf(data = ca_cnty_comp, size = 0.125)
+```
+
+## Shiny App Stuff
+
+```{r}
+if (!require("tidyverse")) install.packages('tidyverse')
+```
+
+```{r}
+final_disease_data$cases <- as.numeric(final_disease_data$cases) 
+final_disease_data$disease <- as.numeric(final_disease_data$disease) 
+##need to convert cases into a number 
+```
+
+```{r}
+ui <- dashboardPage(skin="purple",
+  dashboardHeader(title = "Disease Abundance"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("y", "Select Disease", choices = c("Amebiasis", "Anaplasmosis", "Anthrax", "Babesiosis", "Botulism, Foodborne", "Botulism, Other", "Botulism, Wound", "Brucellosis", "Campylobacteriosis", "Chikungunya Virus Infection", "Cholera", "Ciguatera Fish Poisoning", "Coccidioidomycosis", "Creutzfeldt-Jakob Disease and other Transmissible Spongiform Encephalopathies", "Cryptosporidiosis", "Cyclosporiasis", "Cysticercosis or Taeniasis", "Dengue", "Domoic Acid Poisoning", "Ehrlichiosis", "Flavivirus Infection of Undetermined Species", "Giardiasis", "Hantavirus Infection", "Hemolytic Uremic Syndrome", "Hepatitis E", "acute infection", "Legionellosis", "Leprosy", "Leptospirosis", "Listeriosis", "Lyme Disease", "Malaria", "Paralytic Shellfish Poisoning", "Paratyphoid Fever","Plague, human", "Psittacosis", "Q Fever", "Rabies, human", "Relapsing Fever", "Salmonellosis", "Scombroid Fish Poisoning", "Shiga toxin-producing E. coli (STEC) with HUS", "Shiga toxin-producing E. coli (STEC) without HUS", "Shigellosis", "Spotted Fever Rickettsiosis", "Streptococcal Infection (cases in food and dairy workers)", "Trichinosis", "Tularemia", "Typhoid Fever, case", "Typhus Fever", "Vibrio Infection (non-Cholera)", "Yellow Fever", "Yersiniosis", "Zika Virus Infection"), 
+              selected = "Amebiasis"),
+      hr(),
+      helpText("The data represent cases with an estimated illness onset date from 2001 through the last year indicated from California Confidential Morbidity Reports and/or Laboratory Reports")
+  ),
+  
+  box(title = "Disease Abundance ", width = 8,
+  plotOutput("plot", width = "1200px", height = "500px", click="plot_click"),
+  verbatimTextOutput("info")
+  ) 
+  ) 
+  )
+  ) 
+
+server <- function(input, output, session) { 
+  
+  output$plot <- renderPlot({
+  final_disease_data %>% 
+  filter(county!="California") %>% 
+  ggplot(aes_string(x = "county", y="cases", fill="input$y")) + 
+  geom_col()+
+  theme_light(base_size = 18)+
+  labs (x="County", y="Cases", fill="Disease")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1), legend.position="none")
+  })
+  
+   output$info <- renderText({
+    paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
+  })
+  
+  session$onSessionEnded(stopApp)
+  }
+
+shinyApp(ui, server)
+```
