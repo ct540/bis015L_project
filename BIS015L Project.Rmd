@@ -19,10 +19,7 @@ library(ggmap)
 library(svglite)
 library(shiny)
 library(shinydashboard)
-<<<<<<< HEAD
 options(scipen=999)
-=======
->>>>>>> e3ba4553e9e4626db4ac51847e92e0bce90e30e8
 ``` 
 
 ## Load the Data
@@ -95,44 +92,26 @@ if (!require("tidyverse")) install.packages('tidyverse')
 ```
 
 ```{r}
-<<<<<<< HEAD
 final_disease_data$cases <- as.numeric(final_disease_data$cases) 
 final_disease_data$disease <- as.numeric(final_disease_data$disease) 
-##need to convert cases into a number 
 ```
 
 ```{r}
 ui <- dashboardPage(skin="purple",
-=======
-#final_disease_data$cases=as.numeric ##need to convert cases into a number 
-```
-
-```{r}
-ui <- dashboardPage(
->>>>>>> e3ba4553e9e4626db4ac51847e92e0bce90e30e8
   dashboardHeader(title = "Disease Abundance"),
   dashboardSidebar(disable = T),
   dashboardBody(
   fluidRow(
   box(title = "Plot Options", width = 3,
-<<<<<<< HEAD
   selectInput("y", "Select Disease", choices = c("Amebiasis", "Anaplasmosis", "Anthrax", "Babesiosis", "Botulism, Foodborne", "Botulism, Other", "Botulism, Wound", "Brucellosis", "Campylobacteriosis", "Chikungunya Virus Infection", "Cholera", "Ciguatera Fish Poisoning", "Coccidioidomycosis", "Creutzfeldt-Jakob Disease and other Transmissible Spongiform Encephalopathies", "Cryptosporidiosis", "Cyclosporiasis", "Cysticercosis or Taeniasis", "Dengue", "Domoic Acid Poisoning", "Ehrlichiosis", "Flavivirus Infection of Undetermined Species", "Giardiasis", "Hantavirus Infection", "Hemolytic Uremic Syndrome", "Hepatitis E", "acute infection", "Legionellosis", "Leprosy", "Leptospirosis", "Listeriosis", "Lyme Disease", "Malaria", "Paralytic Shellfish Poisoning", "Paratyphoid Fever","Plague, human", "Psittacosis", "Q Fever", "Rabies, human", "Relapsing Fever", "Salmonellosis", "Scombroid Fish Poisoning", "Shiga toxin-producing E. coli (STEC) with HUS", "Shiga toxin-producing E. coli (STEC) without HUS", "Shigellosis", "Spotted Fever Rickettsiosis", "Streptococcal Infection (cases in food and dairy workers)", "Trichinosis", "Tularemia", "Typhoid Fever, case", "Typhus Fever", "Vibrio Infection (non-Cholera)", "Yellow Fever", "Yersiniosis", "Zika Virus Infection"), 
-=======
-  selectInput("y", "Select Disease", choices = c('Amebiasis', 'Anaplasmosis', 'Anthrax', 'Babesiosis', 'Botulism, Foodborne', 'Botulism, Other', 'Botulism, Wound', 'Brucellosis', 'Campylobacteriosis', 'Chikungunya Virus Infection', 'Cholera', 'Ciguatera Fish Poisoning', 'Coccidioidomycosis', 'Creutzfeldt-Jakob Disease and other Transmissible Spongiform Encephalopathies', 'Cryptosporidiosis', 'Cyclosporiasis', 'Cysticercosis or Taeniasis', 'Dengue', 'Domoic Acid Poisoning', 'Ehrlichiosis', 'Flavivirus Infection of Undetermined Species', 'Giardiasis', 'Hantavirus Infection', 'Hemolytic Uremic Syndrome', 'Hepatitis E, acute infection', 'Legionellosis', 'Leprosy', 'Leptospirosis', 'Listeriosis', 'Lyme Disease', 'Malaria', 'Paralytic Shellfish Poisoning', 'Paratyphoid Fever', 'Plague, human', 'Psittacosis', 'Q Fever', 'Rabies, human', 'Relapsing Fever', 'Salmonellosis', 'Scombroid Fish Poisoning', 'Shiga toxin-producing E. coli (STEC) with HUS', 'Shiga toxin-producing E. coli (STEC) without HUS', 'Shigellosis', 'Spotted Fever Rickettsiosis', 'Streptococcal Infection (cases in food and dairy workers)', 'Trichinosis', 'Tularemia', 'Typhoid Fever, case', 'Typhus Fever', 'Vibrio Infection (non-Cholera)', 'Yellow Fever', 'Yersiniosis', 'Zika Virus Infection'), 
->>>>>>> e3ba4553e9e4626db4ac51847e92e0bce90e30e8
               selected = "Amebiasis"),
       hr(),
       helpText("The data represent cases with an estimated illness onset date from 2001 through the last year indicated from California Confidential Morbidity Reports and/or Laboratory Reports")
   ),
-<<<<<<< HEAD
   
-  box(title = "Disease Abundance ", width = 8,
+  box(title = "Disease Abundance", width = 9,
   plotOutput("plot", width = "1200px", height = "500px", click="plot_click"),
   verbatimTextOutput("info")
-=======
-  box(title = "Disease Abundance ", width = 6,
-  plotOutput("plot", width = "600px", height = "500px")
->>>>>>> e3ba4553e9e4626db4ac51847e92e0bce90e30e8
   ) 
   ) 
   )
@@ -142,7 +121,6 @@ server <- function(input, output, session) {
   
   output$plot <- renderPlot({
   final_disease_data %>% 
-<<<<<<< HEAD
   filter(county!="California") %>% 
   ggplot(aes_string(x = "county", y="cases", fill="input$y")) + 
   geom_col()+
@@ -150,18 +128,13 @@ server <- function(input, output, session) {
   labs (x="County", y="Cases", fill="Disease")+
   theme(axis.text.x = element_text(angle = 60, hjust = 1), legend.position="none")
   })
+
   
    output$info <- renderText({
     paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
-=======
-  ggplot(aes_string(x = "county", y="cases", fill = "sex")) + #?????
-  geom_col()+
-  scale_x_continuous(breaks=seq(0, 30, by = 5))+ theme_light(base_size = 18)
->>>>>>> e3ba4553e9e4626db4ac51847e92e0bce90e30e8
-  })
-  
+})
   session$onSessionEnded(stopApp)
-  }
-
+  
+} 
 shinyApp(ui, server)
 ```
