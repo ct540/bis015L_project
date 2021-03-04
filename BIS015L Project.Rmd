@@ -87,12 +87,44 @@ disease_data$disease <- as.factor(disease_data$disease)
 ```
 
 ```{r}
-disease_data %>% 
-  filter(couunty!="California") %>% 
-  filter(disease=="Amebiasis") %>% 
-  ggplot(aes(x=county, y=cases))+
+ui <- dashboardPage(skin="purple",
+  dashboardHeader(title = "Disease Abundance"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("fill", "Select Disease", choices =unique(disease_data$disease)),
+      hr(),
+      helpText("The data represent cases with an estimated illness onset date from 2001 through the last year indicated from California Confidential Morbidity Reports and/or Laboratory Reports")
+  ),
+  
+  box(title = "Disease Abundance", width = 9,
+  plotOutput("plot", width = "1200px", height = "500px", click="plot_click"),
+  verbatimTextOutput("info")
+  ) 
+  ) 
+  )
+  ) 
+
+server <- function(input, output, session) { 
+  
+  output$plot <- renderPlot({
+  final_disease_data %>% 
+  filter( disease==input$fill, cases=="total", county!="California") %>% 
+  ggplot(aes(x= "county", y= "cases"))+
   geom_col()
+  })
+
+  
+   output$info <- renderText({
+    paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
+})
+  session$onSessionEnded(stopApp)
+  
+} 
+shinyApp(ui, server)
 ```
+
 
 
 ```{r}
@@ -146,7 +178,7 @@ ui <- dashboardPage(skin="purple",
   dashboardBody(
   fluidRow(
   box(title = "Plot Options", width = 3,
-  selectInput("fill", "Select Fill", choices = 
+  selectInput("y", "Select Fill", choices = 
                  c("county", "sex"), 
              selected = "county"),
       hr(),
@@ -166,7 +198,7 @@ server <- function(input, output, session) {
   output$plot <- renderPlot({
   final_disease_data %>% 
   filter(county!="California") %>% 
-  ggplot(aes_string(x = "disease", y="cases", fill="input$fill")) + 
+  ggplot(aes_string(x = "disease", y="cases", fill="input$y")) + 
   geom_col()+
   theme_light(base_size = 18)+
   labs (x="Disease", y="Cases", fill="Selected Fill")+
