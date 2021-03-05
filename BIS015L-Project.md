@@ -1,7 +1,7 @@
 ---
 title: "BIS015L Project"
 authors: "Chloe, Emily, Ibrahim"
-date: "2021-02-28"
+date: "2021-03-04"
 output:
   html_document: 
     theme: spacelab
@@ -14,10 +14,10 @@ output:
 ```r
 library(tidyverse)
 library(janitor)
-library(here)
-library(albersusa)
-library(ggmap)
 library(svglite)
+library(shiny)
+library(shinydashboard)
+options(scipen=999)
 ```
 
 ## Load the Data
@@ -28,7 +28,7 @@ disease <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.cs
 
 ```
 ## 
-## ── Column specification ────────────────────────────────────────────────────────
+## -- Column specification --------------------------------------------------------
 ## cols(
 ##   Disease = col_character(),
 ##   County = col_character(),
@@ -50,17 +50,17 @@ disease
 ## # A tibble: 164,433 x 9
 ##    Disease  County   Year Sex   Cases Population Rate  Lower_95__CI Upper_95__CI
 ##    <chr>    <chr>   <dbl> <chr> <dbl>      <dbl> <chr>        <dbl>        <dbl>
-##  1 Amebias… Alameda  2001 Fema…     7     746596 0.93…        0.377        1.93 
-##  2 Amebias… Alameda  2001 Male      9     718968 1.25…        0.572        2.38 
-##  3 Amebias… Alameda  2001 Total    16    1465564 1.09…        0.624        1.77 
-##  4 Amebias… Alameda  2002 Fema…     4     747987 0.53…        0.146        1.37 
-##  5 Amebias… Alameda  2002 Male      5     720481 0.69…        0.225        1.62 
-##  6 Amebias… Alameda  2002 Total     9    1468468 0.61…        0.28         1.16 
-##  7 Amebias… Alameda  2003 Fema…     1     747441 0.13…        0.003        0.745
-##  8 Amebias… Alameda  2003 Male      5     719746 0.69…        0.226        1.62 
-##  9 Amebias… Alameda  2003 Total     7    1467187 0.47…        0.192        0.983
-## 10 Amebias… Alameda  2004 Fema…     3     746723 0.40…        0.083        1.17 
-## # … with 164,423 more rows
+##  1 Amebias~ Alameda  2001 Fema~     7     746596 0.93~        0.377        1.93 
+##  2 Amebias~ Alameda  2001 Male      9     718968 1.25~        0.572        2.38 
+##  3 Amebias~ Alameda  2001 Total    16    1465564 1.09~        0.624        1.77 
+##  4 Amebias~ Alameda  2002 Fema~     4     747987 0.53~        0.146        1.37 
+##  5 Amebias~ Alameda  2002 Male      5     720481 0.69~        0.225        1.62 
+##  6 Amebias~ Alameda  2002 Total     9    1468468 0.61~        0.28         1.16 
+##  7 Amebias~ Alameda  2003 Fema~     1     747441 0.13~        0.003        0.745
+##  8 Amebias~ Alameda  2003 Male      5     719746 0.69~        0.226        1.62 
+##  9 Amebias~ Alameda  2003 Total     7    1467187 0.47~        0.192        0.983
+## 10 Amebias~ Alameda  2004 Fema~     3     746723 0.40~        0.083        1.17 
+## # ... with 164,423 more rows
 ```
 
 ## Tidy Names of Data
@@ -97,7 +97,7 @@ disease_data
 ##  8 Amebiasis Alameda  2003 Male       5     719746
 ##  9 Amebiasis Alameda  2003 Total      7    1467187
 ## 10 Amebiasis Alameda  2004 Female     3     746723
-## # … with 164,423 more rows
+## # ... with 164,423 more rows
 ```
 
 ## Summary of Data
@@ -134,8 +134,8 @@ Table: Data summary
 
 **Variable type: numeric**
 
-|skim_variable | n_missing| complete_rate|      mean|         sd|   p0|   p25|    p50|    p75|     p100|hist  |
-|:-------------|---------:|-------------:|---------:|----------:|----:|-----:|------:|------:|--------:|:-----|
+|skim_variable | n_missing| complete_rate|      mean|         sd|   p0|   p25|    p50|    p75|     p100|hist                                     |
+|:-------------|---------:|-------------:|---------:|----------:|----:|-----:|------:|------:|--------:|:----------------------------------------|
 |year          |         0|          1.00|   2010.28|       5.49| 2001|  2006|   2010|   2015|     2019|▇▇▆▇▇ |
 |cases         |      4120|          0.97|     10.65|     142.95|    0|     0|      0|      0|    10001|▇▁▁▁▁ |
 |population    |         0|          1.00| 848040.32| 3527101.31|  563| 29245| 125234| 422487| 39959095|▇▁▁▁▁ |
@@ -166,59 +166,51 @@ naniar::miss_var_summary(disease_data)
 ## 6 population      0     0
 ```
 
-## Remove NAs from data
-
-```r
-final_disease_data <- disease_data %>% 
-  na.omit()
-final_disease_data
-```
-
-```
-## # A tibble: 160,313 x 6
-##    disease   county   year sex    cases population
-##    <chr>     <chr>   <dbl> <chr>  <dbl>      <dbl>
-##  1 Amebiasis Alameda  2001 Female     7     746596
-##  2 Amebiasis Alameda  2001 Male       9     718968
-##  3 Amebiasis Alameda  2001 Total     16    1465564
-##  4 Amebiasis Alameda  2002 Female     4     747987
-##  5 Amebiasis Alameda  2002 Male       5     720481
-##  6 Amebiasis Alameda  2002 Total      9    1468468
-##  7 Amebiasis Alameda  2003 Female     1     747441
-##  8 Amebiasis Alameda  2003 Male       5     719746
-##  9 Amebiasis Alameda  2003 Total      7    1467187
-## 10 Amebiasis Alameda  2004 Female     3     746723
-## # … with 160,303 more rows
-```
-
-```r
-anyNA(final_disease_data)
-```
-
-```
-## [1] FALSE
-```
-
-## Uploading California County Map
+## Shiny App
 
 
 ```r
-us_comp <- usa_sf()
-cnty_comp <- counties_sf()
-ca_comp <- us_comp %>% 
-  filter(name=="California")
-ca_comp <- us_comp %>% 
-  filter(name=="California")
-ca_cnty_comp <- cnty_comp %>% 
-  filter(state=="California")
+dat <- disease_data %>% filter(sex=="Total") %>% select(!sex)
+
+ui <- dashboardPage(skin="purple",
+  dashboardHeader(title = "Disease Abundance"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("fill", "Select Disease", choices=unique(disease_data$disease)),
+                hr(),
+      helpText("The data represent cases with an estimated illness onset date from 2001 through the last year indicated from California Confidential Morbidity Reports and/or Laboratory Reports")
+  ),
+  
+  box(title = "Disease Incidence Per California County", width = 9,
+  plotOutput("plot", width = "1200px", height = "500px", click="plot_click"),
+  verbatimTextOutput("info")
+  ) 
+  ) 
+  )
+  ) 
+
+server <- function(input, output, session) { 
+  
+  output$plot <- renderPlot({
+  disease_data %>% 
+  filter(county!="California", disease==input$fill) %>% 
+  ggplot(aes_string(x = "county", y="cases", fill="county")) + 
+  geom_col()+
+  theme_light(base_size = 18)+
+  labs (x="County", y="Cases", fill="Disease")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1), legend.position="none")
+  })
+
+  
+   output$info <- renderText({
+    paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
+})
+  session$onSessionEnded(stopApp)
+  
+} 
+shinyApp(ui, server)
 ```
 
-
-
-```r
-cali_map <- ggplot() +
-  geom_sf(data = ca_comp, size = 0.125)+
-  geom_sf(data = ca_cnty_comp, size = 0.125)
-```
-
-## 
+`<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>`{=html}
