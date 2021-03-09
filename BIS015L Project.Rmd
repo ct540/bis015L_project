@@ -16,6 +16,7 @@ library(janitor)
 library(svglite)
 library(shiny)
 library(shinydashboard)
+library(paletteer)
 options(scipen=999)
 ``` 
 
@@ -51,6 +52,86 @@ dim(disease_data)
 ```{r}
 naniar::miss_var_summary(disease_data)
 ```
+
+## General Data Analysis
+
+1. Which disease is most prevelant throughout all of California?
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(disease) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  arrange(desc(mean_cases))
+```
+```{r}
+disease_data %>%
+  filter(disease == "Campylobacteriosis", sex == "Total") %>%
+  summarise(total_cases = sum(cases))
+
+```
+## Campylobacteriosis is the most prelevant disease in California. It is an infection caused by consuming any raw poltury or meat 
+2. What are the top 5 diseases in California?
+
+```{r}
+top_5_diseases <- disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(disease) %>%
+  summarise(all_cases = sum(cases)) %>%
+  top_n(5) %>%
+  arrange(desc(all_cases))
+top_5_diseases
+
+```
+
+```{r}
+palette <- paletteer_d("wesanderson::Moonrise3")
+
+top_5_diseases %>%
+  ggplot(aes(x=disease, y= all_cases))+
+  geom_col(fill = palette)+
+  theme_linedraw()+
+  theme(axis.text.x = element_text(hjust = 1), plot.title = element_text(size = rel(2), hjust = .5)) +
+  labs(title = "Top 5 Diseases in California from _ to _",
+       x = "Disease",
+       y= "Cases")
+
+```
+
+
+3. What county has the most total disease cases?
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  arrange(desc(mean_cases))
+```
+```{r}
+disease_data %>%
+  filter(county == "Los Angeles", sex == "Total") %>%
+  summarise(total_cases = sum(cases))
+```
+ ## Los Angeles county has the highest number of cases, 89165. 
+
+
+
+4. Are male or females more impacted by disease in California
+```{r}
+disease_data %>%
+  filter(county!="California") %>%
+  group_by(sex) %>%
+  summarise(sum_cases = sum(cases)) %>%
+  arrange(desc(sum_cases))
+```
+
+
+5. Which county has experienced the most growth in disease cases?
+```{r}
+disease_data %>%
+  filter
+
+```
+
 
 ## Shiny App
 
