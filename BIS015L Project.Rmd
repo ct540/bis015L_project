@@ -103,8 +103,8 @@ top_5_diseases %>%
 disease_data %>%
   filter(county!="California", sex=="Total") %>%
   group_by(county) %>%
-  summarise(mean_cases = mean(cases)) %>%
-  arrange(desc(mean_cases))
+  summarise(sum_cases = sum(cases)) %>%
+  arrange(desc(sum_cases))
 ```
 ```{r}
 disease_data %>%
@@ -142,14 +142,23 @@ disease_data %>%
 5. Scaling disease per county
 ```{r}
 disease_data %>%
-  filter(county!="California", sex=="Total") %>%
-  group_by(year) %>%
-  summarise(mean_cases = mean(cases)) %>%
-  mutate( percent = "mean_cases" / "population" )
+  filter(county!="California", sex=="Total", year == "2019") %>%
+  group_by(county) %>%
+  summarise(sum_cases = sum(cases)) %>%
+  mutate(scaling_cases = (sum_cases / population)) %>%
+  arrange(scaling_cases)
   
-
 ```
 
+
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  mutate(scaling_cases = (mean(cases) / population))
+  arrange(desc(scaling_cases))
+
+```
 6. How has disease prevelance changed over time?
 
 ```{r}
