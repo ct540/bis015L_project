@@ -167,12 +167,16 @@ disease_data %>%
 
 ```{r}
 disease_data %>% 
-  filter(county!="California") %>%
+  filter(county=="California", sex != "Total") %>%
   group_by(sex) %>% 
   summarise(sum_cases = sum(cases, na.rm=T)) %>%
-  ggplot(aes(x="county", y="sum_cases", fill="sum_cases")) +
-  geom_col(position="dodge")
+  ggplot(aes(x=sex, y=sum_cases, fill = sex)) +
+  geom_col()+
+    labs(title="Male vs Female Disease Prevalence",
+       x="Sex",
+       y="Number of Cases")
 ```
+It seems like males are more impacted by disease than females!
 
 7. How has infectious disease prevalence changed over time in California?
 ```{r}
