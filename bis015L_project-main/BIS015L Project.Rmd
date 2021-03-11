@@ -1,0 +1,234 @@
+---
+title: "BIS015L Project"
+authors: "Chloe, Emily, Ibrahim"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    theme: spacelab
+    keep_md: yes
+---
+
+## Load Libraries 
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(svglite)
+library(shiny)
+library(shinydashboard)
+library(paletteer)
+options(scipen=999)
+``` 
+
+## Load the Data
+```{r}
+disease <- readr::read_csv("Data/infectious-diseases-by-county-year-and-sex 2.csv")
+disease
+```
+
+## Tidy Names of Data
+```{r}
+disease_tidy <- janitor::clean_names(disease)
+names(disease_tidy)
+```
+
+## Remove data we will not use
+```{r}
+disease_data <- disease_tidy %>% 
+  select(disease, county, year, sex, cases, population)
+disease_data
+```
+
+## Summary of Data
+
+```{r}
+skimr::skim(disease_data)
+```
+
+```{r}
+dim(disease_data)
+```
+
+```{r}
+naniar::miss_var_summary(disease_data)
+```
+
+## General Data Analysis
+
+1. Which disease is most prevelant throughout all of California?
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(disease) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  arrange(desc(mean_cases))
+```
+```{r}
+disease_data %>%
+  filter(disease == "Campylobacteriosis", sex == "Total") %>%
+  summarise(total_cases = sum(cases))
+
+```
+## Campylobacteriosis is the most prelevant disease in California. It is an infection caused by consuming any raw poltury or meat 
+2. What are the top 5 diseases in California?
+
+```{r}
+top_5_diseases <- disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(disease) %>%
+  summarise(all_cases = sum(cases)) %>%
+  top_n(5) %>%
+  arrange(desc(all_cases))
+top_5_diseases
+
+```
+
+```{r}
+palette <- paletteer_d("wesanderson::Moonrise3")
+
+top_5_diseases %>%
+  ggplot(aes(x=reorder(disease,all_cases), y= all_cases))+
+  geom_col(fill = palette)+
+  theme_linedraw()+
+  theme(axis.text.x = element_text(angle=60, hjust = 1), plot.title = element_text(size = rel(2), hjust = .5)) +
+  labs(title = "Top 5 Diseases in California from 2001 to 2019",
+       x = "Disease",
+       y= "Cases")
+
+```
+
+
+3. What county has the most total disease cases?
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  arrange(desc(mean_cases))
+```
+```{r}
+disease_data %>%
+  filter(county == "Los Angeles", sex == "Total") %>%
+  summarise(total_cases = sum(cases))
+```
+ ## Los Angeles county has the highest number of cases, 89165. 
+
+4. County with least total disease cases?
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  arrange(mean_cases)
+```
+```{r}
+disease_data %>%
+  filter(county == "Alpine", sex == "Total") %>%
+  summarise(total_cases = sum(cases))
+```
+Alpine county only has 2 total cases! The population is super small with only 1,175 as of the 2019 census.
+
+
+4. Are male or females more impacted by disease in California
+```{r}
+disease_data %>%
+  filter(county!="California") %>%
+  group_by(sex) %>%
+  summarise(sum_cases = sum(cases)) %>%
+  arrange(desc(sum_cases))
+```
+
+
+5. Scaling disease per county
+```{r}
+disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(year) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  mutate( percent = "mean_cases" / "population" )
+  
+
+```
+
+6. How has disease prevalence changed over time?
+
+```{r}
+cases_overall <- disease_data %>%
+  select(county, population, sex, cases) %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  summarise(sum_cases = sum(cases)) %>%
+  arrange(desc(sum_cases))
+cases_overall
+```
+```{r}
+cases_overall %>%
+  ggplot(aes(x=population, y= sum_cases))+
+  geom_line() +
+  geom_point(size = 1, na.rm = T) +
+  theme(axis.text.x = element_text(hjust = 1), plot.title = element_text(size = rel(2), hjust = .5)) +
+  labs(title = "Top 5 Counties Disease Growth",
+       x = "Year",
+       y= "Income")
+
+```
+
+## Shiny App
+
+```{r}
+dat <- disease_data %>% filter(sex=="Total") %>% select(!sex)
+
+ui <- dashboardPage(skin="purple",
+  dashboardHeader(title = "Disease Abundance"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("fill", "Select Disease", choices=unique(disease_data$disease)),
+                hr(),
+      helpText("The data represent cases with an estimated illness onset date from 2001 through the last year indicated from California Confidential Morbidity Reports and/or Laboratory Reports")
+  ),
+  
+  box(title = "What is the Disease Incidence per California County?", width = 9,
+  plotOutput("plot", width = "1200px", height = "500px", click="plot_click"),
+  verbatimTextOutput("info")
+  ),
+  
+  box(title="What Disease is the Most Prevalent in California from 2001-2019?", width=7,
+      plotOutput("plot2", width="1800px", height="600px")
+    )
+  ) 
+  )
+  ) 
+
+server <- function(input, output, session) { 
+  
+  output$plot <- renderPlot({
+  disease_data %>% 
+  filter(county!="California", disease==input$fill) %>% 
+  ggplot(aes_string(x = "county", y="cases", fill="county")) + 
+  geom_col()+
+  theme_light(base_size = 18)+
+  labs (x="County", y="Cases", fill="Disease")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1), legend.position="none")
+  })
+  
+  output$plot2 <-renderPlot({
+    disease_data %>%
+  filter(sex == "Total", county != "California") %>%
+  ggplot(aes(x=reorder(disease, cases), y= log10(cases)))+
+  geom_col(fill="purple") +
+      theme_light(base_size=18)+
+      labs (x="Disease", y="Log10 Cases", fill="Cases")+
+  theme(axis.text.y = element_text(size=12), legend.position="none") + coord_flip()
+  })
+
+  
+   output$info <- renderText({
+    paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
+})
+  session$onSessionEnded(stopApp)
+  
+} 
+shinyApp(ui, server)
+```
