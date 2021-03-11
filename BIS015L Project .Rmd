@@ -4,14 +4,14 @@ authors: Chloe, Emily, Ibrahim
 date: "`r Sys.Date()`"
 output:
   html_document: 
-    theme: spacelab
+
     keep_md: yes
-  word_document: default
+
 ---
 
 ## Load Libraries 
 ```{r}
-install.packages('highcharter')
+#install.packages('highcharter')
 ```
 
 ```{r message=FALSE, warning=FALSE}

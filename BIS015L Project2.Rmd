@@ -3,17 +3,14 @@ title: "BIS015L Project"
 authors: Chloe, Emily, Ibrahim
 date: "`r Sys.Date()`"
 output:
-  word_document: 
+  html_document: 
+
     keep_md: yes
-  html_document:
-    theme: spacelab
-    keep_md: yes
+
 ---
 
 ## Load Libraries 
-```{r}
-install.packages('highcharter')
-```
+
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -22,7 +19,6 @@ library(svglite)
 library(shiny)
 library(shinydashboard)
 library(paletteer)
-library(highcharter)
 options(scipen=999)
 ``` 
 
@@ -108,17 +104,6 @@ top_5_diseases %>%
 ```
 *We can see the top 5 diseases are Campylobacteriosis, Salmonellosis, Coccidioidomycosis, Giardiasis, Shigellosis.*
 
-Visualizing as a Pie Chart!
-```{r}
-top5_df <- data.frame(x = c(0, 1, 2 ,3 ,4),
-                 y = c(130249, 92173, 73798, 41974, 36605),
-                 name = as.factor(c('Campylobacteriosis', 'Salmonellosis', 'Coccidioidomycosis', 'Giardiasis', 'Shigellosis')))
-
-hc <-  top5_df %>%
-  hchart('pie', hcaes(x = name, y = y), name = 'Relative California Disease Cases')
-
-hc
-```
 
 
 3. What county has the most total disease cases?
