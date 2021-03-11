@@ -9,6 +9,9 @@ output:
 ---
 
 ## Load Libraries 
+```{r}
+install.packages('highcharter')
+```
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -17,6 +20,7 @@ library(svglite)
 library(shiny)
 library(shinydashboard)
 library(paletteer)
+library(highcharter)
 options(scipen=999)
 ``` 
 
@@ -65,8 +69,8 @@ disease_data$population <- as.numeric(disease_data$population)
 disease_data %>%
   filter(county!="California", sex=="Total") %>%
   group_by(disease) %>%
-  summarise(mean_cases = mean(cases)) %>%
-  arrange(desc(mean_cases))
+  summarise(total_cases = sum(cases)) %>%
+  arrange(desc(total_cases))
 ```
 ```{r}
 disease_data %>%
@@ -81,9 +85,9 @@ disease_data %>%
 top_5_diseases <- disease_data %>%
   filter(county!="California", sex=="Total") %>%
   group_by(disease) %>%
-  summarise(all_cases = sum(cases)) %>%
+  summarise(total_cases = sum(cases)) %>%
   top_n(5) %>%
-  arrange(desc(all_cases))
+  arrange(desc(total_cases))
 top_5_diseases
 
 ```
@@ -99,6 +103,18 @@ top_5_diseases %>%
   labs(title = "Top 5 Diseases in California from 2001 to 2019",
        x = "Disease",
        y= "Cases")
+```
+
+Visualizing as a Pie Chart!
+```{r}
+top5_df <- data.frame(x = c(0, 1, 2 ,3 ,4),
+                 y = c(130249, 92173, 73798, 41974, 36605),
+                 name = as.factor(c('Campylobacteriosis', 'Salmonellosis', 'Coccidioidomycosis', 'Giardiasis', 'Shigellosis')))
+
+hc <-  top5_df %>%
+  hchart('pie', hcaes(x = name, y = y), name = 'Relative California Disease Cases')
+
+hc
 ```
 
 
@@ -122,8 +138,8 @@ disease_data %>%
 disease_data %>%
   filter(county!="California", sex=="Total") %>%
   group_by(county) %>%
-  summarise(mean_cases = mean(cases)) %>%
-  arrange(mean_cases)
+  summarise(sum_cases = sum(cases)) %>%
+  arrange(sum_cases)
 ```
 ```{r}
 disease_data %>%
@@ -139,8 +155,8 @@ cases_overall <- disease_data %>%
   select(county, population, sex, cases) %>%
   filter(county!="California", sex=="Total") %>%
   group_by(county) %>%
-  summarise(sum_cases = sum(cases)) %>%
-  arrange(desc(sum_cases))
+  summarise(total_cases = sum(cases)) %>%
+  arrange(desc(total_cases))
 cases_overall
 ```
 ```{r}
@@ -166,12 +182,17 @@ disease_data %>%
 ```
 
 ```{r}
+palette2 <- paletteer_d("wesanderson::Moonrise2")
+```
+
+```{r}
 disease_data %>% 
   filter(county=="California", sex != "Total") %>%
   group_by(sex) %>% 
   summarise(sum_cases = sum(cases, na.rm=T)) %>%
   ggplot(aes(x=sex, y=sum_cases, fill = sex)) +
   geom_col()+
+  scale_fill_manual(values = palette2) +
     labs(title="Male vs Female Disease Prevalence",
        x="Sex",
        y="Number of Cases")
@@ -230,6 +251,17 @@ scaling_pop_cases %>%
 ```
 #We see that the percent of the population infected over time increases, so we can say that the increase in disease prevalence isn't just because there are more people to infect.
 
+
+Looking at the smallest and greatest populations
+
+```{r}
+pop <- disease_data %>%
+  filter(county!="California", sex=="Total") %>%
+  group_by(county) %>%
+  summarise(sum_population = sum(population)) %>%
+  arrange(sum_population)
+pop
+```
 ## Shiny App
 
 ```{r}
