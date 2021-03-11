@@ -60,7 +60,7 @@ naniar::miss_var_summary(disease_data)
 
 ## General Data Analysis
 
-Must first convert cases and population to numeric.
+We must first convert cases and population to numeric.
 ```{r}
 disease_data$cases <- as.numeric(disease_data$cases) 
 disease_data$population <- as.numeric(disease_data$population) 
