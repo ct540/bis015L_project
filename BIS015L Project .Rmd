@@ -3,10 +3,10 @@ title: "BIS015L Project"
 authors: Chloe, Emily, Ibrahim
 date: "`r Sys.Date()`"
 output:
-  word_document: default
-  html_document:
+  html_document: 
     theme: spacelab
     keep_md: yes
+  word_document: default
 ---
 
 ## Load Libraries 
