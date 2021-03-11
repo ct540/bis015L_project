@@ -1,9 +1,10 @@
 ---
 title: "BIS015L Project"
-authors: "Chloe, Emily, Ibrahim"
+authors: Chloe, Emily, Ibrahim
 date: "`r Sys.Date()`"
 output:
-  html_document: 
+  word_document: default
+  html_document:
     theme: spacelab
     keep_md: yes
 ---
